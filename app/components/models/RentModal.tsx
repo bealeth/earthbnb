@@ -195,7 +195,7 @@ const RentModal = () => {
                     title="Baños"
                     subtitle="¿Cuántos baños tiene?"
                     value={bathroomCount}
-                    onChange={(value) =>setCustomValue('broomCount', value)}
+                    onChange={(value) =>setCustomValue('bathroomCount', value)}
                 />
             </div>
         )
