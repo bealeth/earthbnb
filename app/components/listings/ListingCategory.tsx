@@ -21,10 +21,15 @@ const ListingCategory: React.FC<ListingCategoryProps> = ({
                     <div className="ext-lg font-semibold">
                         {label}
                     </div>
-                    <div className="text-neutral-500 font-light">
-                        {description}
-                    </div>
+                    
                 </div>
+                <div className="flex felx-col">
+                    <div className="text-neutral-500 font-light">
+                            {description}
+                    </div>
+                    
+                </div>
+                
             </div>
         </div>
     )

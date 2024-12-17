@@ -75,7 +75,7 @@ const ListingInfo: React.FC<ListingInfoProps>= ({
                     icon={category.icon}
                     label={category.label}
                     description={category.description}
-/>
+                    />
             )}
 
             <hr/>
