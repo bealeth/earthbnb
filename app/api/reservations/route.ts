@@ -23,16 +23,23 @@ export async function POST(
         return NextResponse.error();
     }
 
-    const listingAndResvervation = await prisma.listing.update({
-        where:{
-            id: listingId
-        },
+    const listingAndReservation = await prisma.listing.update({
+        where: { id: listingId },
         data: {
-            reservations:{
-                
-            }
-        }
-    });
+          reservations: {
+            create: {
+              user: {
+                connect: { id: currentUser.id }, // Conectar el usuario existente
+              },
+              startDate,
+              endDate,
+              totalPrice
+            },
+          },
+        },
+        include: { reservations: true },
+      });
+      
 
-    return NextResponse.json(listingAndResvervation);
+    return NextResponse.json(listingAndReservation);
 }
