@@ -16,7 +16,7 @@ interface ListingInfoProps {
     description: string;
     guestCount: number;
     roomCount: number;
-    broomCount: number;
+    broomCount: number | null;
     category: {
         icon: IconType;
         label: string;

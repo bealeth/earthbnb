@@ -6,7 +6,7 @@ import { MdOutlineVilla } from "react-icons/md";
 import CategoryBox from "../CategoryBox";
 import { usePathname, useSearchParams } from "next/navigation";
 import { LuCastle, LuSnowflake } from "react-icons/lu";
-import { GiForestCamp, GiIsland } from "react-icons/gi";
+import { GiForestCamp} from "react-icons/gi";
 import { GoContainer } from "react-icons/go";
 
 export const categories = [
