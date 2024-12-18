@@ -3,13 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Poppins } from "next/font/google";
 import Navbar from "./components/navbar/Navbar";
-import RentModal from "./components/models/RentModal";
+import RentModal from "./components/modals/RentModal";
 import ClientOnly from "./components/ClientOnly";
-import RegisterModal from "./components/models/RegisterModal";
+import RegisterModal from "./components/modals/RegisterModal";
 import ToasterProvider from "./providers/ToasterProvider";
-import LoginModal from "./components/models/LoginModal";
+import LoginModal from "./components/modals/LoginModal";
 import getCurrentUser from "./actions/getCurrentUser";
-import SearchModal from "./components/models/SearchModal";
+import SearchModal from "./components/modals/SearchModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

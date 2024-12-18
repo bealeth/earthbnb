@@ -9,6 +9,8 @@ import CountrySelect, { CountrySelectValue } from "../inputs/CountrySelect";
 import qs from "query-string";
 import { formatISO } from "date-fns";
 import Heading from "../Heading";
+import Calendar from "../inputs/Calendar";
+import Counter from "../inputs/Counter";
 
 enum STEPS{
     LOCATION = 0,
@@ -16,7 +18,7 @@ enum STEPS{
     INFO = 2
 }
 
-const SearchModal =()=>{
+const SearchModal = () =>{
     const searchModal=useSearchModal();
     const router = useRouter();
     const params = useSearchParams();
@@ -113,7 +115,7 @@ const SearchModal =()=>{
     let bodyContent = (
         <div className="flex flex-col gap-8">
             <Heading
-                title="¿A dónde quieres ir="
+                title="¿A dónde quieres ir?"
                 subtitle="Encuentra el lugar indicado"
             />
             <CountrySelect
@@ -127,13 +129,59 @@ const SearchModal =()=>{
         </div>
     )
 
+    if(step ==STEPS.DATE){
+        bodyContent=(
+            <div className="flex flex-col gap-8">
+                <Heading
+                    title="¿Cuándo planeas ir?"
+                    subtitle="Anota la fecha en tu agenda"
+                />
+                <Calendar
+                    value={dateRange}
+                    onChange={(value)=>setDateRange(value.selection)}
+                />
+            </div>
+        )
+    }
+
+    if(step == STEPS.INFO){
+        bodyContent = (
+            <div className="flex flex-col gap-3">
+                <Heading
+                    title="Más información"
+                    subtitle="Encuentra el lugar perfecto para ti."
+                />
+                <Counter
+                    title="Invitados"
+                    subtitle="¿Cuántos se suman al plan?"
+                    value={guestCount}
+                    onChange={(value)=>setGuestCount(value)}
+                />
+                <Counter
+                    title="Habitaciones"
+                    subtitle="¿Cuántas habitaciones prefieren?"
+                    value={roomCount}
+                    onChange={(value)=>setRoomCount(value)}
+                />
+                <Counter
+                    title="Baños"
+                    subtitle="¿Cuántos baños prefiren?"
+                    value={broomCount}
+                    onChange={(value)=>setbRoomCount(value)}
+                />
+            </div>
+        )
+    }
     return(
         <Modal
             isOpen={searchModal.isOpen}
             onClose={searchModal.onClose}
-            onSubmit={searchModal.onOpen}
+            onSubmit={onSubmit}
             title="Filtros"
-            actionLabel="Buscar"
+            actionLabel={actionLabel}
+            secondaryActionLabel={secondaryActionLabel}
+            secondaryAction={step == STEPS.LOCATION ? undefined : onBack}
+            body={bodyContent}
         />
     );
 }

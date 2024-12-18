@@ -2,7 +2,8 @@ import EmptyState from "../components/EmpyState";
 import ClientOnly from "../components/ClientOnly";
 import getCurrentUser from "../actions/getCurrentUser";
 import getReservations from "../actions/getReservations";
-import TripsClient from "./TripsClients";
+import PClient from "./PClients";
+import getListings from "../actions/getListings";
 
 const PropertiesPage = async() =>{
     const currentUser = await getCurrentUser();
@@ -18,16 +19,16 @@ const PropertiesPage = async() =>{
         )
     }
 
-    const reservations = await getReservations({
-        user: currentUser.id
+    const listings = await getListings({
+        userId: currentUser.id
     });
 
-    if(reservations.length == 0){
+    if(listings.length == 0){
         return (
             <ClientOnly>
                 <EmptyState
-                    title = "Sin viajes"
-                    subtitle = "Explora para encontrar destinos"
+                    title = "Aún no tienes propiedades"
+                    subtitle = "Conviértete en anfitrión"
                 />
             </ClientOnly>
         )
@@ -35,8 +36,8 @@ const PropertiesPage = async() =>{
 
     return(
         <ClientOnly>
-            <TripsClient
-                reservations={reservations}
+            <PClient
+                listings={listings}
                 currentUser={currentUser}
             />
         </ClientOnly>
