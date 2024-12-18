@@ -9,6 +9,7 @@ import RegisterModal from "./components/models/RegisterModal";
 import ToasterProvider from "./providers/ToasterProvider";
 import LoginModal from "./components/models/LoginModal";
 import getCurrentUser from "./actions/getCurrentUser";
+import SearchModal from "./components/models/SearchModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default async function RootLayout({
         className={poppins.className}>
           <ClientOnly>
             <ToasterProvider/>
+            <SearchModal/>
             <RentModal/>
             <LoginModal />
             <RegisterModal />

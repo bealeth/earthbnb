@@ -78,7 +78,10 @@ const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
     axios.post('/api/register', data)
     .then(() =>{
+        toast.success('Registrado con éxito')
         registerModal.onClose();
+        loginModal.onOpen();
+        
     })
     .catch((error) =>{
         toast.error('Oh, no. Algo salió mal.');

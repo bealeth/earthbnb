@@ -17,7 +17,7 @@ export async function POST(request: Request, { params }: { params: IParams }) {
 
   // Extraer listingId
   const { listingId } = params;
-  if (!listingId || typeof listingId !== "string") {
+  if (!listingId || typeof listingId != "string") {
     throw new Error("Id incorrecto");
   }
 
