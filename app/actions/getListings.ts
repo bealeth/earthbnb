@@ -11,6 +11,8 @@ export interface IListingsParams {
     locationValue?: string;
     category?: string;
 }
+
+
 export default async function getListings(params: IListingsParams = {}) {
   try {
     const {
