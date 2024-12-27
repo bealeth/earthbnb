@@ -5,6 +5,9 @@ export const config = {
         "/trips",
         "/reservations",
         "/propierties",
-        "/favorites"
+        "/favorites",
+        "/about-us",
+        "/terms",
+        "/help-center"
     ]
 }
