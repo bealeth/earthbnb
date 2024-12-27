@@ -9,15 +9,16 @@ import { TbPhotoPlus } from "react-icons/tb";
 declare global{
     let cloudinary: any; 
 }
+
 interface ImageUploadProps{
-    onChange: (value: string) =>void;
+    onChange: (value: string) => void;
     value: string;
 }
 
 const ImageUpload: React.FC<ImageUploadProps>= ({
     onChange,
     value
-}) =>{
+}) => {
 
     const handleUpload = useCallback((result: any) =>{
         onChange(result.info.secure_url);

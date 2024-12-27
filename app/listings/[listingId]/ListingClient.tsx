@@ -73,7 +73,7 @@ const [dateRange, setDateRange] = useState<Range>(initialDateRange);
         .then(() => {
             toast.success('¡Reserva lista!');
             setDateRange(initialDateRange);
-            router.push('/trip');
+            router.push('/trips');
         })
         .catch(()=>{
             toast.error('Oh, no. Algo salió mal.');
@@ -133,7 +133,7 @@ const [dateRange, setDateRange] = useState<Range>(initialDateRange);
                             description={listing.description}
                             roomCount={listing.roomCount}
                             guestCount={listing.guestCount}
-                            broomCount={listing.broomCount}
+                            bathroomCount={listing.bathroomCount}
                             locationValue={listing.locationValue}
                         />
                         <div

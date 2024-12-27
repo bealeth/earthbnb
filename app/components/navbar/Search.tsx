@@ -15,14 +15,14 @@ const Search = () => {
     const locationValue = params?.get('locationValue');
     const startDate = params?.get('startDate');
     const endDate = params?.get('endDate'); // Corrección aquí
-    const guestCount = params?.get('getCount');
+    const guestCount = params?.get('guestCount');
     
     const locationLabel = useMemo(()=>{
         if(locationValue){
             return getByValue(locationValue as string)?.label;
         }
 
-        return '¿Donde?';
+        return '¿Dónde?';
     },[getByValue, locationValue]);
 
     const durationLabel = useMemo(() => {
@@ -35,21 +35,20 @@ const Search = () => {
                 diff = 1;
             }
     
-            return `${diff} Days`;
+            return `${diff} día(s)`;
         }
-        return '¿Cuando?';
+        return '¿Cuándo?';
     }, [startDate, endDate]);
     
 
     const guestLabel = useMemo(()=>{
         if(guestCount){
-            return `${guestCount} Huéspedes`
+            return `${guestCount} huésped(es)`
         }
-        return 'Huéspedes';
+        return '¿Cuántos?';
     },[guestCount]);
 
     return(
-
         <div 
         onClick={searchModal.onOpen}
         className="

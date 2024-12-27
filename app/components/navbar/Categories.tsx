@@ -79,9 +79,8 @@ const Categories = () => {
                     <CategoryBox 
                     key={item.label}
                     label={item.label}
-                    selected={category == item.label}
+                    selected={category === item.label}
                     icon={item.icon}
-
                     />
                 ))}
             </div>

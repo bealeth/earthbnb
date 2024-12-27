@@ -5,42 +5,39 @@ export interface IListingsParams {
     userId?: string;
     guestCount?: number;
     roomCount?: number;
-    broomCount?: number;
+    bathroomCount?: number;
     startDate?: string;
     endDate?: string;
     locationValue?: string;
     category?: string;
 }
 
-
-export default async function getListings(params: IListingsParams = {}) {
+export default async function getListings(
+  params: IListingsParams
+) {
   try {
+
     const {
       userId,
       roomCount,
       guestCount,
-      broomCount,
+      bathroomCount,
       startDate,
       endDate,
       locationValue,
       category,
     } = params;
 
-    const query: any = {};
+    let query: any = {};
 
     if (userId) query.userId = userId;
     if (category) query.category = category;
-    if (roomCount) query.roomCount = { gte: Number(roomCount) };
-    if (broomCount) query.broomCount = { gte: Number(broomCount) };
-    if (guestCount) query.guestCount = { gte: Number(guestCount) };
+    if (roomCount) query.roomCount = { gte: +roomCount };
+    if (bathroomCount) query.bathroomCount = { gte: +bathroomCount };
+    if (guestCount) query.guestCount = { gte: +guestCount };
     if (locationValue) query.locationValue = locationValue;
 
-    // Validar fechas antes de agregarlas a la consulta
     if (startDate && endDate) {
-      if (isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
-        throw new Error("Fechas inválidas.");
-      }
-
       query.NOT = {
         reservations: {
           some: {
@@ -65,8 +62,7 @@ export default async function getListings(params: IListingsParams = {}) {
 
     return safeListings;
   } catch (error: any) {
-    console.error("Error en getListings:", error); // Log real del error
+    console.error("Error en getListings:", error);
     throw new Error(`Error al obtener las propiedades: ${error.message}`);
-}
-
+  }
 }

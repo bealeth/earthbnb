@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { categories } from "../navbar/Categories";
 
+
 import Modal from "./Modal";
 import useRentModal from "@/app/hooks/useRentModel";
 import Heading from "../Heading";
@@ -57,7 +58,7 @@ const RentModal = () => {
 
     const category = watch('category');
     const guestCount =watch('guestCount');
-    const  bathroomCount = watch('bathroomCount');
+    const bathroomCount = watch('bathroomCount');
     const roomCount =watch('roomCount');
     const location = watch('location');
     const imageSrc = watch('imageSrc');

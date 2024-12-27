@@ -6,23 +6,24 @@ interface IParams {
   listingId?: string;
 }
 
-export async function POST(request: Request, { params }: { params: IParams }) {
-  const currentUser = await getCurrentUser();
+export async function POST(request: Request, props: { params: Promise<IParams> }) {
+    const params = await props.params;
+    const currentUser = await getCurrentUser();
 
-  // Validación del usuario actual
-  if (!currentUser) {
-    return NextResponse.error();
-  }
+    // Validación del usuario actual
+    if (!currentUser) {
+      return NextResponse.error();
+    }
 
-  // Extraer listingId
-  const { listingId } = params;
-  if (!listingId || typeof listingId != "string") {
-    throw new Error("Id incorrecto");
-  }
+    // Extraer listingId
+    const { listingId } = params;
+    if (!listingId || typeof listingId != "string") {
+      throw new Error("Id incorrecto");
+    }
 
-  // Crear copia de favoritesIds y actualizar
- const favoritesIds = [...(currentUser.favoritesIds || [])];
-  favoritesIds.push(listingId);
+    // Crear copia de favoritesIds y actualizar
+    const favoritesIds = [...(currentUser.favoritesIds || [])];
+    favoritesIds.push(listingId);
 
     const user = await prisma.user.update({
       where: { id: currentUser.id },
@@ -34,10 +35,8 @@ export async function POST(request: Request, { params }: { params: IParams }) {
     return NextResponse.json(user);
 }
 
-export async function DELETE(
-    request: Request,
-    {params}: {params: IParams}
-){
+export async function DELETE(request: Request, props: {params: Promise<IParams>}) {
+    const params = await props.params;
     const currentUser = await getCurrentUser();
 
     if(!currentUser){

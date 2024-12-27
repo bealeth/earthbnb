@@ -27,10 +27,10 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
 
         const updatedQuery: any = {
             ...currentQuery,
-            catergory: label
+            category: label
         }
 
-        if(params?.get('categroy') == label){
+        if(params?.get('category') == label){
             delete updatedQuery.category;
         }
 
@@ -61,7 +61,7 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
         `}
         >
             <Icon size={26}/>
-            <div className=" font.medium text-sm">
+            <div className=" font-medium text-sm">
                 {label}
             </div>
         </div>

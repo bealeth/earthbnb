@@ -1,13 +1,15 @@
 'use client';
-import useSearchModal from "@/app/hooks/useSearchModal"
-import Modal from "./Modal";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Range } from "react-date-range";
+import { formatISO } from "date-fns";
+
+import useSearchModal from "@/app/hooks/useSearchModal"
+import Modal from "./Modal";
 import dynamic from "next/dynamic";
 import CountrySelect, { CountrySelectValue } from "../inputs/CountrySelect";
 import qs from "query-string";
-import { formatISO } from "date-fns";
 import Heading from "../Heading";
 import Calendar from "../inputs/Calendar";
 import Counter from "../inputs/Counter";
@@ -19,15 +21,15 @@ enum STEPS{
 }
 
 const SearchModal = () =>{
-    const searchModal=useSearchModal();
     const router = useRouter();
+    const searchModal= useSearchModal();
     const params = useSearchParams();
 
-    const [location, setLocation] =useState<CountrySelectValue>();
     const [step, setStep] = useState(STEPS.LOCATION);
+    const [location, setLocation] = useState<CountrySelectValue>();
     const [guestCount, setGuestCount] = useState(1);
     const [roomCount, setRoomCount] = useState(1);
-    const [broomCount, setbRoomCount] = useState(1);
+    const [bathroomCount, setbathroomCount] = useState(1);
     const [dateRange, setDateRange] = useState<Range>({
         startDate: new Date(),
         endDate: new Date(),
@@ -62,16 +64,17 @@ const SearchModal = () =>{
             locationValue: location?.value,
             guestCount,
             roomCount,
-            broomCount
+            bathroomCount
         };
 
         if(dateRange.startDate){
             updatedQuery.startDate = formatISO(dateRange.startDate);
         }
 
-        if(dateRange.endDate){
-            updatedQuery.startDate = formatISO(dateRange.endDate);
+        if (dateRange.endDate) {
+            updatedQuery.endDate = formatISO(dateRange.endDate);
         }
+        
 
         const url = qs.stringifyUrl({
             url: '/',
@@ -90,7 +93,7 @@ const SearchModal = () =>{
         router,
         guestCount,
         roomCount,
-        broomCount,
+        bathroomCount,
         dateRange,
         onNext,
         params
@@ -129,7 +132,7 @@ const SearchModal = () =>{
         </div>
     )
 
-    if(step ==STEPS.DATE){
+    if(step == STEPS.DATE){
         bodyContent=(
             <div className="flex flex-col gap-8">
                 <Heading
@@ -165,9 +168,9 @@ const SearchModal = () =>{
                 />
                 <Counter
                     title="Baños"
-                    subtitle="¿Cuántos baños prefiren?"
-                    value={broomCount}
-                    onChange={(value)=>setbRoomCount(value)}
+                    subtitle="¿Cuántos baños prefieren?"
+                    value={bathroomCount}
+                    onChange={(value)=>setbathroomCount(value)}
                 />
             </div>
         )
@@ -177,7 +180,7 @@ const SearchModal = () =>{
             isOpen={searchModal.isOpen}
             onClose={searchModal.onClose}
             onSubmit={onSubmit}
-            title="Filtros"
+            title="Filtros de búsqueda"
             actionLabel={actionLabel}
             secondaryActionLabel={secondaryActionLabel}
             secondaryAction={step == STEPS.LOCATION ? undefined : onBack}
