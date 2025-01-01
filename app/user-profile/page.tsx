@@ -3,9 +3,9 @@ import ClientOnly from "../components/ClientOnly";
 import getCurrentUser from "../actions/getCurrentUser";
 
 import getListings from "../actions/getListings";
-import PClient from "../propierties/PClients";
+import ProfileClient from "./ProfileClient";
 
-const PropertiesPage = async() =>{
+const ProfilePage = async() =>{
     const currentUser = await getCurrentUser();
 
     if(!currentUser){
@@ -23,20 +23,9 @@ const PropertiesPage = async() =>{
         userId: currentUser.id
     });
 
-    if(listings.length == 0){
-        return (
-            <ClientOnly>
-                <EmptyState
-                    title = "Vaya, ¿qué ha ocurrido?"
-                    subtitle = "Verifica el código"
-                />
-            </ClientOnly>
-        )
-    }
-
     return(
         <ClientOnly>
-            <PClient
+            <ProfileClient
                 listings={listings}
                 currentUser={currentUser}
             />
@@ -44,5 +33,5 @@ const PropertiesPage = async() =>{
     )
 }
 
-export default PropertiesPage;
+export default ProfilePage;
 

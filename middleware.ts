@@ -15,17 +15,16 @@ export default withAuth(
         }
 
         const protectedRoutes: Record<string, string[]> = {
-            "/trips": ["admin", "user"],
+            "/trips": ["user"],
             "/reservations": ["user"],
-            "/properties": ["user"],
+            "/propierties": ["user"],
             "/favorites": ["user"],
+            "/user-profile": ["user"],
+            "/perfil": ["user"],
             "/reports": ["admin", "user"],
             "/manage-users": ["admin"],
             "/manage-posts": ["admin"],
             "/advices": ["admin"],
-            "/ch-banns": ["center-help"],
-            "/ch-reports": ["center-help"],
-            "/ch-messages": ["center-help"]
         };
 
         const path = req.nextUrl.pathname;
@@ -53,16 +52,5 @@ export default withAuth(
 
 export const config = {
     matcher: [
-        "/trips",
-        "/reservations",
-        "/properties",
-        "/favorites",
-        "/reports",
-        "/admin-users",
-        "/admin-posts",
-        "/admin-messages",
-        "/ch-banns",
-        "/ch-reports",
-        "/ch-messages",
     ],
 };

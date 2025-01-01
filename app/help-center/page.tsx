@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Button from '../components/Button';
 
 const HelpCenterPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,6 +16,7 @@ const HelpCenterPage: React.FC = () => {
     alert('Formulario enviado con éxito');
     // Puedes agregar lógica para manejar el envío, como un POST a tu backend.
   };
+
 
   return (
     <div className="bg-gray-50 text-gray-800 min-h-screen">
@@ -130,6 +132,8 @@ const HelpCenterPage: React.FC = () => {
             </button>
           </form>
         </section>
+
+        
       </main>
     </div>
   );

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,35 +8,56 @@ datasource db {
 }
 
 model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String?
-  email String? @unique
-  emailVerified DateTime?
-  image String?
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String?       @unique
+  emailVerified  DateTime?
+  phone          String?
+  bio            String?
+  image          String?
   hashedPassword String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  favoritesIds String[] @db.ObjectId
-  role String @default("user") // Nuevo campo para roles
-  accounts Account[]
-  listings Listing[]
-  reservations Reservation[]
-  reports Report[] // Relación con Report
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
+  favoritesIds   String[]      @db.ObjectId
+  role           String        @default("user")
+  budget         Int?
+  walletBalance  Int           @default(0) // Balance de la billetera
+  accounts       Account[]
+  listings       Listing[]
+  reservations   Reservation[]
+  sentReports    Report[]      @relation("ReportsByUser") // Reportes enviados por este usuario
+  receivedReports Report[]     @relation("ReportsAgainstUser") // Reportes en contra de este usuario
+  posts          Post[]
+  sentMessages   Message[]     @relation("SentMessages")
+  receivedMessages Message[]   @relation("ReceivedMessages")
+}
+
+model Post {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  detail      String
+  image       String
+  authorId    String    @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  category    String    // Ejemplo: "para hosts", "para huéspedes"
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Account {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  type String
-  provider String
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String @db.ObjectId
+  type             String
+  provider         String
   providerAccountId String
-  refresh_token String?
-  access_token String? @db.String
-  expires_at Int?
-  token_type String?
-  scope String?
-  id_token String? @db.String
-  session_state String?
+  refresh_token    String?
+  access_token     String? @db.String
+  expires_at       Int?
+  token_type       String?
+  scope            String?
+  id_token         String? @db.String
+  session_state    String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -50,44 +65,57 @@ model Account {
 }
 
 model Listing {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  title String
-  description String
-  imageSrc String
-  createdAt DateTime @default(now())
-  category String
-  roomCount Int
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String
+  imageSrc      String
+  createdAt     DateTime  @default(now())
+  category      String
+  roomCount     Int
   bathroomCount Int
-  guestCount Int
+  guestCount    Int
   locationValue String
-  userId String @db.ObjectId
-  price Int
+  userId        String    @db.ObjectId
+  price         Int
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reservations Reservation[]
-  reports Report[] // Relación con Report
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservations  Reservation[]
+  reports       Report[]  // Relación con Report
 }
 
 model Reservation {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  listingId String @db.ObjectId // Renombrado correctamente
-  startDate DateTime
-  endDate DateTime
-  totalPrice Int
-  createdAt DateTime @default(now())
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String    @db.ObjectId
+  listingId     String    @db.ObjectId
+  startDate     DateTime
+  endDate       DateTime
+  totalPrice    Int
+  createdAt     DateTime  @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing       Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
 
 model Report {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  listingId String @db.ObjectId
-  userId String @db.ObjectId
-  reason String
-  createdAt DateTime @default(now())
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  listingId     String?   @db.ObjectId // Opcional si es un reporte directo de usuario
+  reportedUserId String?  @db.ObjectId // Reportar usuarios (opcional)
+  userId        String    @db.ObjectId // Quien genera el reporte
+  reason        String
+  createdAt     DateTime  @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relación con User
-  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade) // Relación con Listing
+  reporter      User      @relation("ReportsByUser", fields: [userId], references: [id], onDelete: Cascade)
+  reportedUser  User?     @relation("ReportsAgainstUser", fields: [reportedUserId], references: [id])
+  listing       Listing?  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId    String   @db.ObjectId
+  receiverId  String   @db.ObjectId
+  content     String
+  createdAt   DateTime @default(now())
+
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
 }
