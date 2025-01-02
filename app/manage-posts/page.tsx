@@ -22,18 +22,15 @@ export default function PostsPage() {
     category: "",
     image: "",
   });
+  const [filter, setFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   const handleError = (error: unknown, customMessage: string) => {
     console.error(customMessage, error);
-
-    if (error instanceof Error) {
-      alert(error.message);
-    } else {
-      alert(customMessage || "Ocurrió un error desconocido.");
-    }
+    alert(customMessage);
   };
 
   const fetchPosts = async () => {
@@ -53,16 +50,21 @@ export default function PostsPage() {
     fetchPosts();
   }, []);
 
+  const filteredAndSortedPosts = posts
+    .filter((post) => (filter ? post.category === filter : true))
+    .sort((a, b) =>
+      sortOrder === "asc"
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title)
+    );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const { title, detail, category, image } = form;
-
     if (!title || !detail || !category || !image) {
       alert("Por favor, completa todos los campos.");
       return;
     }
-
     setIsSubmitting(true);
 
     try {
@@ -130,7 +132,27 @@ export default function PostsPage() {
     <div className="max-w-4xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Publicaciones para el Centro de Ayuda</h1>
 
-      <div className="mb-4">
+      <div className="mb-6 flex gap-4 items-center">
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="border rounded px-4 py-2"
+        >
+          <option value="">Todas las categorías</option>
+          <option value="host">Anfitrión</option>
+          <option value="guest">Huésped</option>
+          <option value="Anuncio">Anuncio</option>
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+          className="border rounded px-4 py-2"
+        >
+          <option value="asc">Ordenar por título (A-Z)</option>
+          <option value="desc">Ordenar por título (Z-A)</option>
+        </select>
+
         {!isFormVisible && (
           <Button label="Crear Publicación" onClick={() => setIsFormVisible(true)} />
         )}
@@ -147,12 +169,10 @@ export default function PostsPage() {
           >
             <RxCross1 size={24} />
           </button>
-
-          <form onSubmit={handleSubmit} className="mb-8 space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <h2 className="text-xl font-semibold mb-4">
               {editingPost ? "Editar Publicación" : "Crear Nueva Publicación"}
             </h2>
-
             <div>
               <label className="block mb-1 font-medium">Título</label>
               <input
@@ -184,8 +204,9 @@ export default function PostsPage() {
                 <option value="" disabled>
                   Seleccionar categoría
                 </option>
-                <option value="para hosts">Para anfitriones</option>
-                <option value="para huespedes">Para huéspedes</option>
+                <option value="host">Anfitrión</option>
+                <option value="guest">Huésped</option>
+                <option value="Anuncio">Anuncio</option>
               </select>
             </div>
 
@@ -193,12 +214,18 @@ export default function PostsPage() {
               <label className="block mb-1 font-medium">Imagen</label>
               <ImageUpload
                 value={form.image}
-                onChange={(value) => setForm({ ...form, image: value })}
+                onChange={(value) =>
+                  setForm((prevForm) => ({
+                    ...prevForm,
+                    image: value,
+                  }))
+                }
               />
+
             </div>
 
             <Button
-              label={isSubmitting ? "Guardando..." : editingPost ? "Guardar Cambios" : "Crear Publicación"}
+              label={isSubmitting ? "Guardando..." : "Guardar Publicación"}
               onClick={handleSubmit}
               disabled={isSubmitting}
             />
@@ -207,7 +234,7 @@ export default function PostsPage() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {posts.map((post) => (
+        {filteredAndSortedPosts.map((post) => (
           <div key={post.id} className="border rounded shadow-sm p-4 bg-white">
             <img
               src={post.image}
@@ -218,7 +245,6 @@ export default function PostsPage() {
             <p className="text-gray-600">{post.detail}</p>
             <p className="text-sm text-gray-500">Categoría: {post.category}</p>
             <p className="text-sm text-gray-500">Autor: {post.author?.name || "Desconocido"}</p>
-
             <div className="flex gap-2 mt-2">
               <Button label="Editar" onClick={() => handleEdit(post)} />
               <Button label="Eliminar" onClick={() => handleDelete(post.id)} outline />

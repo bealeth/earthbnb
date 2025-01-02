@@ -13,8 +13,6 @@ import getCurrentUser from "./actions/getCurrentUser";
 import SearchModal from "./components/modals/SearchModal";
 import Footer from "./components/footer/Footer";
 
-
-
 export const metadata: Metadata = {
   title: "Earthbnb",
   description: "Proyecto Escolar",

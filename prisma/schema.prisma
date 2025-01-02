@@ -28,8 +28,6 @@ model User {
   sentReports    Report[]      @relation("ReportsByUser") // Reportes enviados por este usuario
   receivedReports Report[]     @relation("ReportsAgainstUser") // Reportes en contra de este usuario
   posts          Post[]
-  sentMessages   Message[]     @relation("SentMessages")
-  receivedMessages Message[]   @relation("ReceivedMessages")
 }
 
 model Post {
@@ -109,13 +107,3 @@ model Report {
   listing       Listing?  @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
 
-model Message {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  senderId    String   @db.ObjectId
-  receiverId  String   @db.ObjectId
-  content     String
-  createdAt   DateTime @default(now())
-
-  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-}

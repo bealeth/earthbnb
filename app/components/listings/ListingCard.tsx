@@ -95,6 +95,9 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         </div>
                 </div>
                 <div className="font-semibold text-lg">
+                        {data.title}
+                </div>
+                <div className="text-md">
                         {location?.region}, {location?.label}
                 </div>
                 <div className="font-light text-neutral-500">

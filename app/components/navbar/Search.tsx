@@ -3,9 +3,11 @@
 import useCountries from "@/app/hooks/useCountries";
 import useSearchModal from "@/app/hooks/useSearchModal";
 import { differenceInDays } from "date-fns";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { BiSearch } from "react-icons/bi";
+import { AiOutlineClear } from "react-icons/ai";
+import Button from "../Button";
 
 const Search = () => {
     const searchModal = useSearchModal();
@@ -40,6 +42,7 @@ const Search = () => {
         return '¿Cuándo?';
     }, [startDate, endDate]);
     
+    const router = useRouter();
 
     const guestLabel = useMemo(()=>{
         if(guestCount){
@@ -48,10 +51,10 @@ const Search = () => {
         return '¿Cuántos?';
     },[guestCount]);
 
-    return(
+    return (
         <div 
-        onClick={searchModal.onOpen}
-        className="
+          onClick={searchModal.onOpen}
+          className="
             border-[1px]
             w-full
             md:w-auto
@@ -59,65 +62,78 @@ const Search = () => {
             rounded-full
             shadow-sm
             hover:shadow-md
-            transitition
+            transition
             cursor-pointer">
-                <div 
+            
+            <div 
+              className="
+                flex
+                flex-row
+                items-center
+                justify-between">
+                
+              {/* Ubicación */}
+              <div 
                 className="
-                    flex
-                    flex-row
-                    items-center
-                    justifiy-between">
-
-                    <div 
-                    className="
-                        text-sm
-                        font-semiblod
-                        px-10">
-                        {locationLabel}
-                    </div>
-
-                    <div 
-                    className="
-                       hidden
-                       sm:block
-                       text-sm
-                       px-6
-                       border-x-[1px]
-                       flex-1
-                       text-center">
-                        {durationLabel}
-                    </div>
-
-                    <div 
-                    className="
-                        text-sm
-                        pl-6
-                        pr-2
-                        text-gray-600
-                        flex
-                        flex-row
-                        items-center
-                        gap-3">
-                        
-                        <div className="hidden sm:block">
-                            {guestLabel}</div>
-                        
-                            <div 
-                            className="
-                            p-2
-                            bg-blue
-                            rounded-full
-                            text-white
-                                ">
-                                <BiSearch size={18} />
-                            </div>
-                    </div>
-
-                    
-                    
+                  text-sm
+                  px-10">
+                {locationLabel}
+              </div>
+      
+              {/* Duración */}
+              <div 
+                className="
+                  hidden
+                  sm:block
+                  text-sm
+                  px-6
+                  border-x-[1px]
+                  flex-1
+                  text-center">
+                {durationLabel}
+              </div>
+      
+              {/* Huéspedes y Botones */}
+              <div 
+                className="
+                  text-sm
+                  pl-6
+                  pr-2
+                  text-gray-600
+                  flex
+                  flex-row
+                  items-center
+                  gap-3">
+      
+                {/* Cantidad de huéspedes */}
+                <div className="hidden sm:block">
+                  {guestLabel}
                 </div>
+      
+                {/* Botón Limpiar Filtros */}
+                <AiOutlineClear 
+                  size={26} 
+                  className="text-gray-500 hover:text-gray-700 transition cursor-pointer" 
+                  onClick={(e) => {
+                    e.stopPropagation(); // Evita que el modal de búsqueda se abra
+                    router.push('/'); // Navega al inicio o limpia los filtros
+                  }} 
+                />
+      
+                {/* Botón Buscar */}
+                <div 
+                  className="
+                    p-2
+                    bg-blue
+                    rounded-full
+                    text-white">
+                  <BiSearch size={18} />
+                </div>
+              </div>
+            </div>
         </div>
-    );
+      );
+      
 }
 
 export default Search;

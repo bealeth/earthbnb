@@ -48,7 +48,19 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(posts);
+    // Mapear los posts para asegurar que las fechas sean cadenas ISO
+    const safePosts = posts.map((post) => ({
+      ...post,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+      author: {
+        ...post.author,
+        createdAt: post.author.createdAt.toISOString(),
+        updatedAt: post.author.updatedAt.toISOString(),
+      },
+    }));
+
+    return NextResponse.json(safePosts);
   } catch (error) {
     console.error("Error al obtener publicaciones:", error);
     return NextResponse.json(
@@ -57,3 +69,4 @@ export async function GET() {
     );
   }
 }
+

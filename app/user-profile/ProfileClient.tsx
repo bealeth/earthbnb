@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useCallback } from "react";
 import Container from "../components/Container";
 import Heading2 from "../components/Heading2";
@@ -10,7 +9,7 @@ import toast from "react-hot-toast";
 import ListingCard from "../components/listings/ListingCard";
 import AvatarProfile from "../components/AvatarProfile";
 import Modal from "../components/Modal";
-import Button from "../components/Button"; // Importa tu componente personalizado
+import Button from "../components/Button"; 
 import ImageUpload from "../components/inputs/ImageUpload";
 
 interface PClientProps {
@@ -22,6 +21,7 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
   const router = useRouter();
   const [deletingId, setDeletingId] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+
   const [editForm, setEditForm] = useState({
     name: currentUser?.name || "",
     phone: currentUser?.phone || "",
@@ -29,6 +29,8 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
     password: "",
     image: currentUser?.image || "",
   });
+
+  const [passwordError, setPasswordError] = useState<string>("");
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -41,9 +43,32 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({ ...prev, [name]: value }));
+    // Validación cuando la contraseña cambia
+    if (name === "password") {
+      validatePassword(value);
+    }
+  };
+
+  const validatePassword = (password: string) => {
+    // Regla de validación
+    if (password.length < 8) {
+      setPasswordError("La contraseña debe tener al menos 8 caracteres.");
+    } else if (!/[A-Z]/.test(password)) {
+      setPasswordError("La contraseña debe contener al menos una mayúscula.");
+    } else if (!/\d/.test(password)) {
+      setPasswordError("La contraseña debe contener al menos un número.");
+    } else {
+      setPasswordError("");
+    }
   };
 
   const handleSaveChanges = () => {
+    // Si hay algún error de validación en la contraseña, no permitir guardar los cambios
+    if (passwordError) {
+      toast.error(passwordError);
+      return;
+    }
+
     axios
       .put(`/api/users`, { ...editForm, id: currentUser?.id })
       .then(() => {
@@ -86,7 +111,6 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
             title={currentUser?.name ?? "Nombre desconocido"}
             subtitle={"Colaborador en Earthbnb"}
           />
-
           <div className="mt-4">
             <p className="text-sm text-gray-600">
               <span className="font-bold">Teléfono:</span> {currentUser?.phone || "No especificado"}
@@ -103,7 +127,6 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
               {currentUser?.bio || "No especificada"}
             </p>
           </div>
-
           <div className="mt-4 w-full max-w-xs">
             <Button
               label="Editar Perfil"
@@ -144,7 +167,7 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
           <div className="p-6">
             <h2 className="text-2xl font-bold mb-4">Editar Perfil</h2>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Nombre</label>
+              <label className="block text-md font-medium text-gray-700">Nombre</label>
               <input
                 name="name"
                 value={editForm.name}
@@ -153,7 +176,7 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Teléfono</label>
+              <label className="block text-md font-medium text-gray-700">Teléfono</label>
               <input
                 name="phone"
                 value={editForm.phone}
@@ -164,7 +187,7 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Biografía</label>
+              <label className="block text-md font-medium text-gray-700">Biografía</label>
               <textarea
                 name="bio"
                 value={editForm.bio}
@@ -174,18 +197,21 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
               ></textarea>
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
+              <label className="block text-md font-medium text-gray-700">Nueva Contraseña</label>
               <input
                 name="password"
                 value={editForm.password}
                 onChange={handleInputChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                 type="password"
-                placeholder="******"
+                placeholder="********"
               />
+              {passwordError && (
+                <p className="text-blue text-sm mt-1">{passwordError}</p>
+              )}
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Imagen de Perfil</label>
+              <label className="block text-md font-medium text-gray-700">Imagen de Perfil</label>
               <ImageUpload value={editForm.image} onChange={handleImageChange} />
             </div>
             <div className="flex justify-end space-x-2">

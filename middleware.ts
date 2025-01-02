@@ -25,6 +25,8 @@ export default withAuth(
             "/manage-users": ["admin"],
             "/manage-posts": ["admin"],
             "/advices": ["admin"],
+            "/ch-reports": ["center-help"],
+            "/ch-banns": ["center-help"]
         };
 
         const path = req.nextUrl.pathname;
