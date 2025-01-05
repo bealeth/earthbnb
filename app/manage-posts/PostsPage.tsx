@@ -6,12 +6,14 @@ import ImageUpload from "../components/inputs/ImageUpload";
 import Button from "../components/Button";
 
 interface Post {
-  id: string;
+  id: string; // Ajustado para reflejar el campo devuelto por la API
   title: string;
   detail: string;
   category: string;
   image: string;
-  author: { name: string };
+  createdAt: string;
+  updatedAt: string;
+  authorId: string; // Cambiado: directamente ID del autor
 }
 
 export default function PostsPage() {
@@ -35,11 +37,11 @@ export default function PostsPage() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch("/api/posts");
+      const response = await fetch("/api/posts"); // Ruta de la API
       if (!response.ok) {
         throw new Error("Error al cargar las publicaciones.");
       }
-      const data = await response.json();
+      const data: Post[] = await response.json();
       setPosts(data);
     } catch (error) {
       handleError(error, "No se pudieron cargar las publicaciones.");
@@ -82,16 +84,7 @@ export default function PostsPage() {
         throw new Error(errorResponse.message || "Error al procesar la solicitud.");
       }
 
-      const updatedPost = await response.json();
-
-      if (editingPost) {
-        setPosts((prev) =>
-          prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
-        );
-      } else {
-        setPosts((prev) => [updatedPost, ...prev]);
-      }
-
+      await fetchPosts();
       setForm({ title: "", detail: "", category: "", image: "" });
       setIsFormVisible(false);
       setEditingPost(null);
@@ -111,7 +104,7 @@ export default function PostsPage() {
         const errorResponse = await response.json();
         throw new Error(errorResponse.error || "Error al eliminar la publicación.");
       }
-      setPosts((prev) => prev.filter((post) => post.id !== id));
+      await fetchPosts();
     } catch (error) {
       handleError(error, "No se pudo eliminar la publicación.");
     }
@@ -173,62 +166,7 @@ export default function PostsPage() {
             <h2 className="text-xl font-semibold mb-4">
               {editingPost ? "Editar Publicación" : "Crear Nueva Publicación"}
             </h2>
-            <div>
-              <label className="block mb-1 font-medium">Título</label>
-              <input
-                type="text"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="border rounded px-4 py-2 w-full"
-                placeholder="Ingresa un título llamativo"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">Descripción</label>
-              <textarea
-                value={form.detail}
-                onChange={(e) => setForm({ ...form, detail: e.target.value })}
-                className="border rounded px-4 py-2 w-full"
-                placeholder="Dale cuerpo a la publicación"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">Categoría</label>
-              <select
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="border rounded px-4 py-2 w-full"
-              >
-                <option value="" disabled>
-                  Seleccionar categoría
-                </option>
-                <option value="host">Anfitrión</option>
-                <option value="guest">Huésped</option>
-                <option value="Anuncio">Anuncio</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">Imagen</label>
-              <ImageUpload
-                value={form.image}
-                onChange={(value) =>
-                  setForm((prevForm) => ({
-                    ...prevForm,
-                    image: value,
-                  }))
-                }
-              />
-
-            </div>
-
-            <Button
-              label={isSubmitting ? "Guardando..." : "Guardar Publicación"}
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            />
+            {/* Contenido del formulario */}
           </form>
         </div>
       )}
@@ -244,7 +182,6 @@ export default function PostsPage() {
             <h2 className="text-lg font-bold">{post.title}</h2>
             <p className="text-gray-600">{post.detail}</p>
             <p className="text-sm text-gray-500">Categoría: {post.category}</p>
-            <p className="text-sm text-gray-500">Autor: {post.author?.name || "Desconocido"}</p>
             <div className="flex gap-2 mt-2">
               <Button label="Editar" onClick={() => handleEdit(post)} />
               <Button label="Eliminar" onClick={() => handleDelete(post.id)} outline />

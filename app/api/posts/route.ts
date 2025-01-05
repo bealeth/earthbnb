@@ -40,33 +40,24 @@ export async function POST(request: Request) {
   }
 }
 
+// Obtener todos los documentos
 export async function GET() {
   try {
-    const posts = await prisma.post.findMany({
-      include: {
-        author: true,
+    const documents = await prisma.post.findMany({
+      select: {
+        id: true,
+        title: true,
+        detail: true,
+        image: true,
+        authorId: true,
+        createdAt: true,
+        updatedAt: true,
+        category: true,
       },
     });
-
-    // Mapear los posts para asegurar que las fechas sean cadenas ISO
-    const safePosts = posts.map((post) => ({
-      ...post,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
-      author: {
-        ...post.author,
-        createdAt: post.author.createdAt.toISOString(),
-        updatedAt: post.author.updatedAt.toISOString(),
-      },
-    }));
-
-    return NextResponse.json(safePosts);
+    return NextResponse.json(documents);
   } catch (error) {
-    console.error("Error al obtener publicaciones:", error);
-    return NextResponse.json(
-      { error: "Error al obtener publicaciones" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al obtener documentos" }, { status: 500 });
   }
 }
 
