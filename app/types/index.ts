@@ -29,16 +29,17 @@ export type SafeUser = Omit<
     role: string;
 }
 
-export type SafeReport = Omit<
-  Report,
-  "createdAt"
-> & {
-  createdAt: string;
-};
+export type SafeReport = Omit<Report, "createdAt" | "title"> & {
+    createdAt: string;
+    title: string; // Si tienes `title` en algún lugar de los `Report`, lo mantienes
+    reportedListingTitle: string;  // Agregar el campo relacionado a la `listing`
+  };
+  
 
 export type SafePost = Omit<
     Post,
-    "createdAt"    
+    "createdAt"  
 > & {
     createdAt: string;
+    
 }

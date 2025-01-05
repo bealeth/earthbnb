@@ -1,5 +1,6 @@
 'use client';
-import { useState, useCallback } from "react";
+
+import { useState, useCallback, useEffect } from "react";
 import Container from "../components/Container";
 import Heading2 from "../components/Heading2";
 import { SafeListing, SafeUser } from "../types";
@@ -9,7 +10,7 @@ import toast from "react-hot-toast";
 import ListingCard from "../components/listings/ListingCard";
 import AvatarProfile from "../components/AvatarProfile";
 import Modal from "../components/Modal";
-import Button from "../components/Button"; 
+import Button from "../components/Button";
 import ImageUpload from "../components/inputs/ImageUpload";
 
 interface PClientProps {
@@ -32,25 +33,18 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
 
   const [passwordError, setPasswordError] = useState<string>("");
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
+  const handleEditClick = () => setIsEditing(true);
 
-  const handleCloseModal = () => {
-    setIsEditing(false);
-  };
+  const handleCloseModal = () => setIsEditing(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({ ...prev, [name]: value }));
-    // Validación cuando la contraseña cambia
-    if (name === "password") {
-      validatePassword(value);
-    }
+
+    if (name === "password") validatePassword(value);
   };
 
   const validatePassword = (password: string) => {
-    // Regla de validación
     if (password.length < 8) {
       setPasswordError("La contraseña debe tener al menos 8 caracteres.");
     } else if (!/[A-Z]/.test(password)) {
@@ -63,7 +57,6 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
   };
 
   const handleSaveChanges = () => {
-    // Si hay algún error de validación en la contraseña, no permitir guardar los cambios
     if (passwordError) {
       toast.error(passwordError);
       return;
@@ -83,24 +76,23 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
     setEditForm((prev) => ({ ...prev, image: url }));
   };
 
-  const onCancel = useCallback(
-    (id: string) => {
-      setDeletingId(id);
-      axios
-        .delete(`/api/listings/${id}`)
-        .then(() => {
-          toast.success("Propiedad eliminada");
-          router.refresh();
-        })
-        .catch((error) => {
-          toast.error(error?.response?.data?.error);
-        })
-        .finally(() => {
-          setDeletingId("");
-        });
-    },
-    [router]
-  );
+  const onCancel = useCallback(async (id: string) => {
+    setDeletingId(id);
+
+    try {
+      await axios.delete(`/api/listings/${id}`);
+      toast.success("Propiedad eliminada");
+      router.refresh();
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.error || "Error al eliminar la propiedad");
+      } else {
+        toast.error("Error desconocido al eliminar la propiedad");
+      }
+    } finally {
+      setDeletingId("");
+    }
+  }, [router]);
 
   return (
     <Container>
@@ -116,7 +108,10 @@ const PClient: React.FC<PClientProps> = ({ listings, currentUser }) => {
               <span className="font-bold">Teléfono:</span> {currentUser?.phone || "No especificado"}
             </p>
             <p className="text-sm text-gray-600">
-              <span className="font-bold">Balance:</span> ${currentUser?.walletBalance ?? 0}
+              <span className="font-bold">Amonestaciones:</span> ${currentUser?.sanctionAmount ?? 0}
+            </p>
+            <p className="text-sm text-gray-600">
+              <span className="font-bold">Advertencias:</span> {currentUser?.warnings ?? 0}
             </p>
             <p className="text-sm text-gray-600">
               <span className="font-bold">Tiempo en la app:</span>{" "}

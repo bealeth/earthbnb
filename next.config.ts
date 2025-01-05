@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    // Deja vacío si no tienes experimentos específicos
   },
   images: {
     remotePatterns: [

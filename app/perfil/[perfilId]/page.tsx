@@ -2,7 +2,6 @@ import getUserById from "@/app/actions/getUserById";
 import getListings from "@/app/actions/getListings";
 import Container from "@/app/components/Container";
 import EmptyState from "@/app/components/EmptyState";
-import UserProfile from "@/app/components/UserProfile";
 import PerfilClient from "@/app/perfil/[perfilId]/PerfilClients";
 
 interface ProfilePageProps {
@@ -33,18 +32,10 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
   // Renderizar el perfil del usuario con sus datos.
   return (
-    <Container>
-      <UserProfile
-        name={user.name || "Usuario anónimo"}
-        joinedDate={user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Fecha no especificada"}
-        profilePicture={user.image || "/placeholder-profile.png"} bio={""}      />
-      {/* Puedes agregar una sección opcional para listados del usuario */}
-      {listings.length > 0 && (
-        <PerfilClient listings={listings} />
-      )}
+    <div>
 
-      
-    </Container>
+    </div>
+
   );
 };
 

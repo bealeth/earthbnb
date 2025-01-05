@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../Button';
+import RentModal from '../modals/RentModal';
+import ReportModal from '../modals/ReportModal';
 
 interface ListingReportProps {
   reason: string;
@@ -51,21 +53,8 @@ const ListingReport: React.FC<ListingReportProps> = ({
       </button>
 
       {isVisible && (
-        <div className="bg-white rounded-lg shadow-md p-6 mt-4">
-          <h2 className="text-lg font-medium mb-4">Reportar un problema</h2>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Descríbenos el problema"
-            className="w-full p-2 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 outline-none mb-4"
-            rows={4}
-          />
-          <Button
-            disabled={disabled || loading}
-            label={loading ? 'Enviando...' : 'Enviar reporte'}
-            onClick={handleSubmit}
-          />
-        </div>
+        
+          <ReportModal/>
       )}
     </div>
   );

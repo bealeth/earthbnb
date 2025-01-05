@@ -63,8 +63,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       case "center-help":
         return (
           <>
-            <MenuItem onClick={() => router.push("/ch-banns")} label="Amonestaciones" />
-            <MenuItem onClick={() => router.push("/ch-reports")} label="Reportes" />
+            
             <hr />
             <MenuItem onClick={() => signOut({ callbackUrl: "/" })} label="Cerrar sesión" />
           </>
@@ -72,9 +71,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       case "admin":
         return (
           <>
-            <MenuItem onClick={() => router.push("/manage-users")} label="Usuarios" />
-            <MenuItem onClick={() => router.push("/manage-posts")} label="Publicaciones" />
-            <MenuItem onClick={() => router.push("/advices")} label="Avisos" />
             <hr />
             <MenuItem onClick={() => signOut({ callbackUrl: "/" })} label="Cerrar sesión" />
           </>
@@ -106,14 +102,14 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   return (
     <div ref={menuRef} className="relative">
   <div className="flex flex-row items-center gap-3">
-    {(currentUser === null || currentUser?.role === "user") && (
+   
       <div
         onClick={onRent}
         className="block text-sm py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer"
       >
         Conviértete en anfitrión
       </div>
-    )}
+  
     <div
       onClick={toggleOpen}
       className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition"

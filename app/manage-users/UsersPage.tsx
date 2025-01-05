@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaCheckCircle, FaEquals, FaTimesCircle } from "react-icons/fa";
 import Button from "../components/Button";
 
 interface User {
@@ -9,6 +10,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  status: string;
 }
 
 const AdminPage = () => {
@@ -16,35 +18,35 @@ const AdminPage = () => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Cargar usuarios desde la API
   useEffect(() => {
     axios
       .get("/api/users")
       .then((response) => {
-        setUsers(response.data);
-        setFilteredUsers(response.data);
+        const filteredAdmins = response.data.filter((user: User) => user.role !== "admin");
+        setUsers(filteredAdmins);
+        setFilteredUsers(filteredAdmins);
       })
       .catch((error) => console.error("Error al cargar usuarios", error));
   }, []);
 
-  // Filtrar usuarios por categoría
   useEffect(() => {
     let filtered = [...users];
-
     if (filterCategory !== "all") {
-      if (filterCategory === "guest/host") {
-        filtered = filtered.filter((user) =>
-          user.role === "guest" || user.role === "host"
-        );
+      if (filterCategory === "user") {
+        filtered = filtered.filter((user) => user.role === "user");
       } else if (filterCategory === "centro de ayuda") {
-        filtered = filtered.filter((user) => user.role === "support");
-      } else if (filterCategory === "administradores") {
-        filtered = filtered.filter((user) => user.role === "admin");
+        filtered = filtered.filter((user) => user.role === "center-help");
       }
     }
-
-    // Ordenar usuarios por email
+    if (searchQuery.trim() !== "") {
+      filtered = filtered.filter(
+        (user) =>
+          user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
     filtered.sort((a, b) => {
       if (sortOrder === "asc") {
         return a.email.localeCompare(b.email);
@@ -52,11 +54,9 @@ const AdminPage = () => {
         return b.email.localeCompare(a.email);
       }
     });
-
     setFilteredUsers(filtered);
-  }, [filterCategory, sortOrder, users]);
+  }, [filterCategory, sortOrder, searchQuery, users]);
 
-  // Eliminar usuario
   const deleteUser = (id: string) => {
     const confirmDelete = window.confirm("¿Estás seguro de eliminar este usuario?");
     if (confirmDelete) {
@@ -69,28 +69,23 @@ const AdminPage = () => {
     }
   };
 
-  // Amonestar usuario
-  const handleAmonestation = (id: string) => {
-    axios
-      .patch("/api/users", { id })
-      .then(() => {
-        setUsers(
-          users.map((user) =>
-            user.id === id ? { ...user, role: "warned" } : user
-          )
-        );
-        alert("Se registró la amonestación para este usuario.");
-      })
-      .catch((error) => console.error("Error al amonestar usuario", error));
+  const renderStatusIcon = (status: string) => {
+    if (status === "Verde" || null) {
+      return <FaCheckCircle className="text-green-500" />;
+    } else if (status === "Amarillo") {
+      return <FaEquals className="text-yellow-500" />;
+    } else if (status === "Rojo") {
+      return <FaTimesCircle className="text-red-500" />;
+    }
+    return null;
   };
 
   return (
     <div className="min-h-screen bg-white p-8">
-      <h1 className="text-2xl text-blue font-bold mb-4">
+      <h1 className="text-2xl font-bold mb-4">
         Administración de Usuarios
       </h1>
 
-      {/* Controles de filtrado y orden */}
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <div>
           <label className="block text-gray-700">Categoría:</label>
@@ -102,7 +97,6 @@ const AdminPage = () => {
             <option value="all">Todos</option>
             <option value="user">Guest/Host</option>
             <option value="centro de ayuda">Centro de Ayuda</option>
-            <option value="administradores">Administradores</option>
           </select>
         </div>
 
@@ -117,6 +111,17 @@ const AdminPage = () => {
             <option value="desc">Descendente</option>
           </select>
         </div>
+
+        <div className="flex-1">
+          <label className="block text-gray-700">Buscar:</label>
+          <input
+            type="text"
+            placeholder="Buscar por nombre o correo"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border rounded-lg px-4 py-2 w-full"
+          />
+        </div>
       </div>
 
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
@@ -125,9 +130,7 @@ const AdminPage = () => {
             <tr className="bg-gray-200">
               <th className="py-3 px-6 text-gray-700 font-medium">Nombre</th>
               <th className="py-3 px-6 text-gray-700 font-medium">Correo</th>
-              <th className="py-3 px-6 text-gray-700 font-medium text-center">
-                Acciones disponibles
-              </th>
+              <th className="py-3 px-6 text-gray-700 font-medium text-center">Eliminar</th>
             </tr>
           </thead>
           <tbody>
@@ -136,26 +139,13 @@ const AdminPage = () => {
                 <td className="py-3 px-6 border-b">{user.name}</td>
                 <td className="py-3 px-6 border-b">{user.email}</td>
                 <td className="py-3 px-6 border-b text-center">
-                <Button
+                  <Button
                     label="Eliminar usuario"
                     onClick={() => deleteUser(user.id)}
                     outline
                     small
-                />
-                <div className="mt-2">
-                    {user.role === "warned" ? (
-                    <span className="text-red-500 font-semibold">Amonestado</span>
-                    ) : (
-                    <Button
-                        label="Amonestar"
-                        onClick={() => handleAmonestation(user.id)}
-                        outline
-                        small
-                    />
-                    )}
-                </div>
+                  />
                 </td>
-
               </tr>
             ))}
             {filteredUsers.length === 0 && (

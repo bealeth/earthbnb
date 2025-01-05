@@ -3,7 +3,6 @@
 import Container from "@/app/components/Container";
 import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
-import ListingReport from "@/app/components/listings/ListingReport";
 import ListingReservation from "@/app/components/listings/ListingReservation";
 import { categories } from "@/app/components/navbar/Categories";
 import useLoginModal from "@/app/hooks/useLoginModal";
@@ -18,14 +17,12 @@ import toast from "react-hot-toast";
 const initialDateRange = {
   startDate: new Date(),
   endDate: new Date(),
-  key: 'selection'
+  key: 'selection',
 };
 
 interface ListingClientProps {
   reservations?: safeReservation[];
-  listing: SafeListing & {
-    user: SafeUser
-  };
+  listing: SafeListing & { user: SafeUser };
   currentUser?: SafeUser | null;
   reports?: SafeReport[];
 }
@@ -34,15 +31,15 @@ const ListingClient: React.FC<ListingClientProps> = ({
   listing,
   reservations = [],
   currentUser,
-  reports = []
 }) => {
   const loginModal = useLoginModal();
   const router = useRouter();
-
   const [isLoading, setIsLoading] = useState(false);
   const [totalPrice, setTotalPrice] = useState(listing.price);
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
   const [reason, setReason] = useState(""); // Estado para el motivo del reporte
+  const [isVisible, setIsVisible] = useState(false); // Estado para controlar visibilidad del formulario
+
 
   const disabledDates = useMemo(() => {
     let dates: Date[] = [];
@@ -50,7 +47,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
     reservations.forEach((reservation: any) => {
       const range = eachDayOfInterval({
         start: new Date(reservation.startDate),
-        end: new Date(reservation.endDate)
+        end: new Date(reservation.endDate),
       });
       dates = [...dates, ...range];
     });
@@ -64,12 +61,13 @@ const ListingClient: React.FC<ListingClientProps> = ({
 
     setIsLoading(true);
 
-    axios.post('/api/reservations', {
-      totalPrice,
-      startDate: dateRange.startDate,
-      endDate: dateRange.endDate,
-      listingId: listing?.id
-    })
+    axios
+      .post('/api/reservations', {
+        totalPrice,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        listingId: listing?.id,
+      })
       .then(() => {
         toast.success('¡Reserva lista!');
         setDateRange(initialDateRange);
@@ -81,48 +79,51 @@ const ListingClient: React.FC<ListingClientProps> = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [
-    totalPrice,
-    dateRange,
-    listing?.id,
-    router,
-    currentUser,
-    loginModal
-  ]);
-
-  const onCreateReport = useCallback(() => {
-    if (!currentUser) {
-      return loginModal.onOpen();
-    }
-
-    if (!reason) {
-      return toast.error("Por favor, proporciona un motivo para el reporte.");
-    }
-
-    setIsLoading(true);
-
-    axios.post('/api/reports', {
-      reason,
-      listingId: listing?.id
-    })
-      .then(() => {
+  }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
+  
+  const onCreateReport = useCallback(
+    async ({ reason }: { reason: string }) => {
+      if (!currentUser) {
+        loginModal.onOpen();
+        return;
+      }
+  
+      if (!reason.trim()) {
+        toast.error("Por favor, proporciona una descripción válida.");
+        return;
+      }
+  
+      setIsLoading(true);
+  
+      // Log para verificar los datos que se están enviando
+      console.log("Datos del reporte enviados al servidor:", {
+        reason: reason.trim(),
+        listingId: listing?.id,
+      });
+  
+      try {
+        axios.post('app/api/report', {
+          reason: reason.trim(),
+          listingId: listing?.id,
+        });
+  
         toast.success("¡Reporte enviado!");
         setReason(""); // Limpia el estado del motivo
-      })
-      .catch(() => {
+        setIsVisible(false); // Cierra el formulario de reporte
+      } catch (error) {
+        console.error("Error al enviar el reporte:", error); // Log del error para depuración
         toast.error("Oh, no. Algo salió mal al enviar el reporte.");
-      })
-      .finally(() => {
+      } finally {
         setIsLoading(false);
-      });
-  }, [reason, listing?.id, currentUser, loginModal]);
+      }
+    },
+    [currentUser, loginModal, listing?.id]
+  );
+  
 
   useEffect(() => {
     if (dateRange.startDate && dateRange.endDate) {
-      const dayCount = differenceInDays(
-        dateRange.endDate,
-        dateRange.startDate
-      );
+      const dayCount = differenceInDays(dateRange.endDate, dateRange.startDate);
 
       if (dayCount && listing.price) {
         setTotalPrice(dayCount * listing.price);
@@ -133,8 +134,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
   }, [dateRange, listing.price]);
 
   const category = useMemo(() => {
-    return categories.find((item) =>
-      item.label == listing.category);
+    return categories.find((item) => item.label === listing.category);
   }, [listing.category]);
 
   return (
@@ -148,7 +148,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
             id={listing.id}
             currentUser={currentUser}
           />
-          <div className="
+          <div
+            className="
               grid
               grid-cols-1
               md:grid-cols-7
@@ -163,13 +164,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
               bathroomCount={listing.bathroomCount}
               locationValue={listing.locationValue}
             />
-            <div
-              className="
-              order-first
-              mb-10
-              md:order-last
-              md:col-span-3
-              ">
+            <div className="order-first mb-10 md:order-last md:col-span-3">
               <ListingReservation
                 price={listing.price}
                 totalPrice={totalPrice}
@@ -179,14 +174,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 disabled={isLoading}
                 disabledDates={disabledDates}
               />
-              {/* Aquí integramos ListingReport */}
-              <div className="mt-4">
-                <ListingReport
-                  reason={reason}
-                  setReason={setReason}
-                  onSubmit={onCreateReport}
-                />
-              </div>
             </div>
           </div>
         </div>

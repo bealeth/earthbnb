@@ -7,6 +7,7 @@ import UserMenu from "./UserMenu";
 import React from "react";
 import { SafeUser } from "@/app/types";
 import Categories from "./Categories";
+import RentModal from "../modals/RentModal";
 
 interface NavbarProps {
   currentUser?: SafeUser | null;
@@ -25,7 +26,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
           <div className="flex flex-row items-center justify-between gap-3 md:gap-0">
             <Logo />
             {/* Los usuarios "user" y no autenticados pueden ver el Search */}
-            {!isAdminOrCenterHelp && <Search />}
+            {!isAdminOrCenterHelp && <Search /> }
+            {!isAdminOrCenterHelp && <RentModal /> }
             <UserMenu currentUser={currentUser} />
           </div>
         </Container>

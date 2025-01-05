@@ -18,6 +18,7 @@ const getUserById = async (userId?: string) => {
       name: user.name,
       createdAt: user.createdAt,
       image: user.image || "/default-profile.png",
+      
     };
   } catch (error) {
     console.error("Error fetching user by ID:", error);

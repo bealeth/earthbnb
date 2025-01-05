@@ -1,62 +1,54 @@
 import prisma from "@/app/libs/prismadb";
 
 interface IParams {
-  listingId?: string; // Filtrar por ID del alojamiento
-  userId?: string; // Filtrar por el ID del usuario que reportó
-  authorId?: string; // Filtrar por ID del autor del alojamiento
+  listingId?: string;
+  userId?: string;
+  reporterId?: string;
 }
 
 export default async function getReports(params: IParams) {
   try {
-    const { listingId, userId, authorId } = params;
-
+    const { listingId, userId, reporterId } = params;
+    
     const query: any = {};
+    if (listingId) query.reportedListingId = listingId;
+    if (userId) query.userId = userId;
+    if (reporterId) query.reporterId = reporterId;
 
-    // Filtrar por ID del alojamiento
-    if (listingId) {
-      query.listingId = listingId;
-    }
-
-    // Filtrar por el ID del usuario que realizó el reporte
-    if (userId) {
-      query.userId = userId;
-    }
-
-    // Filtrar por autor del alojamiento reportado
-    if (authorId) {
-      query.listing = { userId: authorId }; // Relación anidada
-    }
-
-    // Obtener reportes desde Prisma
     const reports = await prisma.report.findMany({
       where: query,
       include: {
-        listing: true, // Incluir información del alojamiento relacionado
-        user: true, // Incluir información del usuario que reportó
+        reportedListing: true,
+        reporter: true,
       },
-      orderBy: {
-        createdAt: "desc", // Ordenar reportes por fecha de creación, descendente
-      },
+      orderBy: { createdAt: "desc" },
     });
 
-    // Formatear los reportes con fechas serializadas
-    const SafeReports = reports.map((report) => ({
-      ...report,
+    // Log para verificar el formato que estamos enviando
+    console.log('Reports desde la base de datos:', reports);
+
+    // Asegurarnos de que siempre devolvemos un array
+    if (!Array.isArray(reports)) {
+      console.error("Error: La respuesta no es un array");
+      return []; // Si no es un array, devolver un arreglo vacío
+    }
+
+    const SafeReport = reports.map((report) => ({
+      id: report.id,
+      reporterName: report.reporter?.name || "Desconocido",
+      reportedListingTitle: report.reportedListing?.title || "Alojamiento no especificado",
+      reason: report.reason,
+      status: report.status,
       createdAt: report.createdAt.toISOString(),
-      listing: {
-        ...report.listing,
-        createdAt: report.listing.createdAt.toISOString(),
-      },
-      user: {
-        ...report.user,
-        createdAt: report.user.createdAt.toISOString(),
-        updatedAt: report.user.updatedAt.toISOString(),
-        emailVerified: report.user.emailVerified?.toISOString() || null,
-      },
+      reviewedAt: report.reviewedAt ? report.reviewedAt.toISOString() : null,
+      sanctionAmount: report.sanctionAmount ?? null,
     }));
 
-    return SafeReports;
+    console.log("Reportes formateados correctamente:", SafeReport);
+    return SafeReport;
+
   } catch (error: any) {
-    throw new Error(error.message || "Error al obtener reportes");
+    console.error("Error al obtener los reportes: ", error);
+    return []; // Devolver un arreglo vacío en caso de error
   }
 }

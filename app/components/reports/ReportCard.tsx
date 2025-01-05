@@ -48,13 +48,13 @@ const ReportCard: React.FC<ReportCardProps> = ({
                     Reporte ID: {data.id}
                 </div>
                 <div className="font-light text-neutral-500">
-                    Origen del reporte: {data.userId || "Usuario desconocido"}
+                    Origen del reporte: {data.id|| "Usuario desconocido"}
                 </div>
                 <div className="text-sm text-neutral-400">
                     Fecha de reporte: {format(new Date(data.createdAt), 'PP')}
                 </div>
                 <div className="text-sm text-neutral-400">
-                    Alojamiento reportado: {data.listingId}
+                    Alojamiento reportado: {data.reportedListingId}
                 </div>
                 <div className="font-light text-neutral-700">
                     Razón: {data.reason || "No especificada"}

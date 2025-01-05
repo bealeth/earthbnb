@@ -6,79 +6,85 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-
 model User {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
   name           String?
-  email          String?       @unique
+  email          String?      @unique
   emailVerified  DateTime?
   phone          String?
   bio            String?
   image          String?
   hashedPassword String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now())
-  favoritesIds   String[]      @db.ObjectId
-  role           String        @default("user")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+  favoritesIds   String[]     @db.ObjectId
+  role           String       @default("user")
   budget         Int?
-  walletBalance  Int           @default(0) // Balance de la billetera
+  walletBalance  Int          @default(0)
+  sanctionAmount Float        @default(0) // Cantidad total acumulada por sanciones
+  status         String       @default("Verde") // Indicador del estado del usuario
+  warnings       Int          @default(0)
+  reportsMade    Report[]     @relation("UserReporter") // Reportes hechos por este usuario
+  reportsReceived Report[]    @relation("UserSanctioned") // Reportes recibidos (este usuario es el sancionado)
   accounts       Account[]
   listings       Listing[]
   reservations   Reservation[]
-  sentReports    Report[]      @relation("ReportsByUser") // Reportes enviados por este usuario
-  receivedReports Report[]     @relation("ReportsAgainstUser") // Reportes en contra de este usuario
   posts          Post[]
 }
 
+
 model Post {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  detail      String
-  image       String
-  authorId    String    @db.ObjectId
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
-  category    String    // Ejemplo: "para hosts", "para huéspedes"
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  detail    String
+  image     String
+  authorId  String    @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  category  String    // Ejemplo: "para hosts", "para huéspedes"
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Account {
-  id               String @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String @db.ObjectId
-  type             String
-  provider         String
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String @db.ObjectId
+  type              String
+  provider          String
   providerAccountId String
-  refresh_token    String?
-  access_token     String? @db.String
-  expires_at       Int?
-  token_type       String?
-  scope            String?
-  id_token         String? @db.String
-  session_state    String?
+  refresh_token     String?
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique ([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
+}
+
+model Advice {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
 }
 
 model Listing {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
   title         String
   description   String
   imageSrc      String
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime      @default(now())
   category      String
   roomCount     Int
   bathroomCount Int
   guestCount    Int
   locationValue String
-  userId        String    @db.ObjectId
+  userId        String        @db.ObjectId
   price         Int
 
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations  Reservation[]
-  reports       Report[]  // Relación con Report
 }
 
 model Reservation {
@@ -95,15 +101,22 @@ model Reservation {
 }
 
 model Report {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  listingId     String?   @db.ObjectId // Opcional si es un reporte directo de usuario
-  reportedUserId String?  @db.ObjectId // Reportar usuarios (opcional)
-  userId        String    @db.ObjectId // Quien genera el reporte
-  reason        String
-  createdAt     DateTime  @default(now())
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt         DateTime    @default(now()) // Fecha de creación del reporte
+  status            ReportStatus @default(POR_RESOLVER) // Estado del reporte
+  sanctionAmount    Float        // Cantidad económica de amonestación
+  reason            String       // Motivo del reporte
 
-  reporter      User      @relation("ReportsByUser", fields: [userId], references: [id], onDelete: Cascade)
-  reportedUser  User?     @relation("ReportsAgainstUser", fields: [reportedUserId], references: [id])
-  listing       Listing?  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  // Relación con el usuario que reporta
+  reporterId        String      @db.ObjectId
+  reporter          User        @relation("UserReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  // Relación con el usuario reportado
+  reportedUserId    String      @db.ObjectId
+  reportedUser      User        @relation("UserSanctioned", fields: [reportedUserId], references: [id], onDelete: Cascade)
 }
 
+enum ReportStatus {
+  POR_RESOLVER  // Reporte pendiente de resolución
+  SOLUCIONADO   // Reporte resuelto
+}

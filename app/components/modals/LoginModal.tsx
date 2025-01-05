@@ -83,7 +83,7 @@ const onSubmit: SubmitHandler<FieldValues> = (data) => {
         if(callback?.ok){
             toast.success('¡Bienvenido!');
             router.refresh();
-            loginModal.onClose;
+            loginModal.onClose();
         }
 
         if(callback?.error){
