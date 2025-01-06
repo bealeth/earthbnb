@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { SafeReport } from "@/app/types";
 import Button from "../components/Button";
 import Input from "../components/inputs/Input";
+import { ReportStatus } from "@prisma/client"; // Asegúrate de importar el enum
 
 interface ReportsTableProps {
   reports: SafeReport[];
   onUpdateReport: (
     id: string,
-    status: string,
+    status: ReportStatus, // Usar el enum ReportStatus en lugar de string
     sanctionAmount?: number,
     message?: string
   ) => void;
@@ -21,54 +22,39 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
   onDeleteReport,
   updatingReportId,
 }) => {
-  const [sanctionAmounts, setSanctionAmounts] = useState<{ [id: string]: number }>({});
+  const [sanctionAmounts, setSanctionAmounts] = useState<{ [id: string]: number | undefined }>({});
   const [visibleSanctionInput, setVisibleSanctionInput] = useState<string | null>(null);
-
-  // Estados para filtros, ordenamiento y búsqueda
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<ReportStatus | "">("");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Manejo del cambio en el input de amonestación
   const handleSanctionChange = (id: string, value: string) => {
     setSanctionAmounts({ ...sanctionAmounts, [id]: parseFloat(value) || 0 });
   };
 
-  // Función para ordenar, filtrar y buscar en los reportes
   const filteredReports = reports
     .filter((report) => {
-      // Filtrar por estado
       const statusMatches =
         filterStatus === ""
           ? true
-          : filterStatus === "Avisos enviados"
-          ? report.status === "Aviso enviado"
-          : report.status === "Por resolver";
+          : filterStatus === ReportStatus.POR_RESOLVER
+          ? report.status === ReportStatus.POR_RESOLVER
+          : report.status === ReportStatus.SOLUCIONADO;
 
-      // Filtrar por búsqueda
-      const searchMatches =
-        report.reportedListingTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        report.reason.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return statusMatches && searchMatches;
+      return statusMatches;
     })
     .sort((a, b) => {
       if (sortBy === "createdAt") {
         return sortOrder === "asc"
           ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      } else if (sortBy === "reportedListingTitle") {
-        return sortOrder === "asc"
-          ? a.reportedListingTitle.localeCompare(b.reportedListingTitle)
-          : b.reportedListingTitle.localeCompare(a.reportedListingTitle);
       }
       return 0;
     });
 
   return (
     <div>
-      {/* Controles para filtro, ordenamiento y búsqueda */}
       <div className="mb-4 flex flex-wrap gap-4">
         <div>
           <label className="block text-sm font-medium">Ordenar por</label>
@@ -78,7 +64,6 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
             onChange={(e) => setSortBy(e.target.value)}
           >
             <option value="createdAt">Fecha de creación</option>
-            <option value="reportedListingTitle">Nombre del alojamiento</option>
           </select>
         </div>
         <div>
@@ -97,18 +82,18 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
           <select
             className="border p-2 rounded"
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => setFilterStatus(e.target.value as ReportStatus | "")}
           >
             <option value="">Todos</option>
-            <option value="Avisos enviados">Avisos enviados</option>
-            <option value="Pendiente">Pendientes</option>
+            <option value={ReportStatus.POR_RESOLVER}>Pendientes</option>
+            <option value={ReportStatus.SOLUCIONADO}>Resueltos</option>
           </select>
         </div>
         <div className="flex-1">
           <label className="block text-sm font-medium">Buscar</label>
           <input
             type="text"
-            placeholder="Buscar por título o motivo"
+            placeholder="Buscar por nombre, correo o motivo"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="border p-2 rounded w-full"
@@ -116,11 +101,11 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
         </div>
       </div>
 
-      {/* Tabla de reportes */}
       <table className="border-collapse border border-gray-300 w-full text-left">
         <thead>
           <tr>
-            <th className="border px-4 py-2">Título</th>
+            <th className="border px-4 py-2">Reportero</th>
+            <th className="border px-4 py-2">Usuario Reportado</th>
             <th className="border px-4 py-2">Motivo</th>
             <th className="border px-4 py-2">Estado</th>
             <th className="border px-4 py-2">Acciones</th>
@@ -129,7 +114,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
         <tbody>
           {filteredReports.length === 0 ? (
             <tr>
-              <td colSpan={4} className="border px-4 py-2 text-center">
+              <td colSpan={5} className="border px-4 py-2 text-center">
                 No hay reportes disponibles
               </td>
             </tr>
@@ -137,9 +122,18 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
             filteredReports.map((report) => (
               <tr key={report.id}>
                 <td className="border px-4 py-2">
-                  {report.reportedListingTitle || "Desconocido"}
+                  {report.reporterId || "Desconocido"} <br />
+                  <span className="text-sm text-gray-500">
+                    {report.reporterId || "Sin correo"}
+                  </span>
                 </td>
-                <td className="border px-4 py-2">{report.reason || "Desconocido"}</td>
+                <td className="border px-4 py-2">
+                  {report.reportedUserId || "Desconocido"} <br />
+                  <span className="text-sm text-gray-500">
+                    {report.reportedUserId || "Sin correo"}
+                  </span>
+                </td>
+                <td className="border px-4 py-2">{report.reason || "Sin motivo"}</td>
                 <td className="border px-4 py-2">{report.status || "Desconocido"}</td>
                 <td className="border px-4 py-2">
                   <div className="flex items-center gap-2">
@@ -166,10 +160,9 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
                           onClick={() =>
                             onUpdateReport(
                               report.id,
-                              "Aviso enviado",
+                              ReportStatus.SOLUCIONADO,  // Cambié este valor a SOLUCIONADO
                               sanctionAmounts[report.id],
-
-                              "Aviso enviado"
+                              "Amonestación aplicada"
                             )
                           }
                           disabled={updatingReportId === report.id}

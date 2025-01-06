@@ -1,24 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
 
-export async function GET(req: Request, { params }: { params: { reportId: string } }) {
-  const { reportId } = params;
 
-  try {
-    const report = await prisma.report.findUnique({
-      where: { id: reportId },
-      include: { reporter: true, reportedUser: true },
-    });
-
-    if (!report) {
-      return NextResponse.json({ error: "Report not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(report);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch report" }, { status: 500 });
-  }
-}
 
 export async function PATCH(req: Request, { params }: { params: { reportId: string } }) {
   const { reportId } = params;

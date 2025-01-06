@@ -29,11 +29,13 @@ export type SafeUser = Omit<
     role: string;
 }
 
-export type SafeReport = Omit<Report, "createdAt" | "title"> & {
+export type SafeReport = Omit<Report, "createdAt" | "title" | "reportedUser"> & {
     createdAt: string;
-    title: string; // Si tienes `title` en algún lugar de los `Report`, lo mantienes
-    reportedListingTitle: string;  // Agregar el campo relacionado a la `listing`
+    title: string;
+    // Mantén solamente `reportedUserId` en vez de `reportedUser`
+    reportedUserId: string;
   };
+  
   
 
 export type SafePost = Omit<

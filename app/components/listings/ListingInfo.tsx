@@ -45,7 +45,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
             <div className="flex flex-col gap-2">
                 {/* Información del anfitrión */}
                 <div className="text-xl flex flex-row items-center gap-2">
-                    <Link href={`/perfil/${user.id}`} legacyBehavior>
+                    <Link href={`/profile/${user.id}`} legacyBehavior>
                         <a className="flex flex-row items-center gap-2 hover:underline">
                             <Avatar src={user?.image} />
                             <div className="text-blue-600 hover:text-blue-800">

@@ -26,3 +26,39 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to create report" }, { status: 500 });
   }
 }
+
+// GET: Obtener todos los reportes
+export async function GET() {
+  try {
+    const reports = await prisma.report.findMany({
+      select: {
+        id: true,
+        createdAt: true,
+        status: true,
+        sanctionAmount: true,
+        reason: true,
+        reporter: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        reportedUser: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+    return NextResponse.json(reports);
+  } catch (error) {
+    console.error("Error al obtener los reportes:", error);
+    return NextResponse.json(
+      { error: "Error al obtener los reportes" },
+      { status: 500 }
+    );
+  }
+}
