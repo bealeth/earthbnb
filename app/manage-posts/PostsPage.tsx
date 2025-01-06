@@ -106,7 +106,7 @@ export default function PostsPage() {
       }
       await fetchPosts();
     } catch (error) {
-      handleError(error, "No se pudo eliminar la publicación.");
+      handleError(error, "No tienes permiso para eliminar la publicación.");
     }
   };
 
@@ -167,6 +167,61 @@ export default function PostsPage() {
               {editingPost ? "Editar Publicación" : "Crear Nueva Publicación"}
             </h2>
             {/* Contenido del formulario */}
+            <div>
+              <label className="block mb-1 font-medium">Título</label>
+              <input
+                type="text"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                className="border rounded px-4 py-2 w-full"
+                placeholder="Ingresa un título llamativo"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium">Descripción</label>
+              <textarea
+                value={form.detail}
+                onChange={(e) => setForm({ ...form, detail: e.target.value })}
+                className="border rounded px-4 py-2 w-full"
+                placeholder="Dale cuerpo a la publicación"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium">Categoría</label>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className="border rounded px-4 py-2 w-full"
+              >
+                <option value="" disabled>
+                  Seleccionar categoría
+                </option>
+                <option value="Anfitrion">Anfitrión</option>
+                <option value="Huesped">Huésped</option>
+                <option value="Anuncio">Anuncio</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium">Imagen</label>
+              <ImageUpload
+                value={form.image}
+                onChange={(value) =>
+                  setForm((prevForm) => ({
+                    ...prevForm,
+                    image: value,
+                  }))
+                }
+              />
+            </div>
+
+            <Button
+              label={isSubmitting ? "Guardando..." : "Guardar Publicación"}
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            />
           </form>
         </div>
       )}
