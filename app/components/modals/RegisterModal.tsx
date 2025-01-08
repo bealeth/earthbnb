@@ -65,6 +65,13 @@ const RegisterModal = () => {
                 register={register}
                 errors={errors}
                 required
+                validation={{
+                    required: "El correo electrónico es obligatorio",
+                    pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "El formato del correo no es válido",
+                    },
+                }}
             />
             <Input
                 id="name"
@@ -121,8 +128,6 @@ const RegisterModal = () => {
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         setIsLoading(true);
-
-        
 
         axios
             .post('/api/register', data)
