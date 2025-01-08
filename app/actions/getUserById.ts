@@ -11,13 +11,18 @@ const getUserById = async (userId?: string) => {
       },
     });
 
+    console.log("Datos del usuario desde Prisma:", user);
+
     if (!user) return null;
 
     return {
       id: user.id,
       name: user.name,
       createdAt: user.createdAt,
-      image: user.image || "/default-profile.png",
+      image: user.image || "/images/placeholder.png",
+      bio: user.bio,
+      listings: user.listings, 
+
       
     };
   } catch (error) {

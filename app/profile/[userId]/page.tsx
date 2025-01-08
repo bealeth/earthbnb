@@ -25,14 +25,14 @@ const UserProfile = async ({ params }: { params: Promise<IParams> }) => {
   const safeUser = {
     id: user.id,
     name: user.name || "Usuario desconocido",
-    image: user.image || "/default-profile.png",
+    image: user.image || "/images/placeholder.png",
     createdAt: user.createdAt.toISOString(),
     updatedAt: new Date().toISOString(),
     emailVerified: null,
     role: "user",
-    email: "",
+    email: "no",
     phone: "",
-    bio: "El usuario no ha proporcionado una biografía.",
+    bio: user.bio,
     hashedPassword: null,
     warnings: 0,
     favoritesIds: [],
@@ -40,12 +40,25 @@ const UserProfile = async ({ params }: { params: Promise<IParams> }) => {
     walletBalance: 0,
     sanctionAmount: 0,
     status: "active",
+    listings: user.listings || []
   };
 
   return (
     <div>
       <ClientOnly>
         <ProfileHead user={safeUser} />
+        <div
+            className="
+            mt-10
+            grid
+            grid-cols-1
+            sm:grid-cols-2
+            md:grids-cols-3
+            lg:gris-cols-4
+            xl:grid-cols-5
+            2xl:grid-cols-6
+            gap-8">
+            </div>
       </ClientOnly>
     </div>
   );
