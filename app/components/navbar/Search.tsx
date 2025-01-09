@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { BiSearch } from "react-icons/bi";
 import { AiOutlineClear } from "react-icons/ai";
-import Button from "../Button";
+
 
 const Search = () => {
     const searchModal = useSearchModal();

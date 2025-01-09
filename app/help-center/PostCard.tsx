@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Button from "../components/Button";
 import { useState } from "react";
@@ -26,7 +25,6 @@ const PostCard: React.FC<PostCardProps> = ({
   actionLabel,
   actionId = "",
 }) => {
-  const router = useRouter();
   const [isContentVisible, setContentVisible] = useState(false);
 
   const toggleContentVisibility = (e: React.MouseEvent<HTMLButtonElement>) => {

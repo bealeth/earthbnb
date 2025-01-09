@@ -54,7 +54,11 @@ export async function GET(request: Request, props: { params: Promise<IParams> })
         if (!listing || listing.userId !== currentUser.id) {
             return NextResponse.json({ error: "No autorizado o listado no encontrado" }, { status: 403 });
         }
-    } catch (error) {
-        return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
-    }
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred");
+    };
+    
 }

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaCheckCircle, FaEquals, FaTimesCircle } from "react-icons/fa";
 import Button from "../components/Button";
 
 interface User {
@@ -69,7 +68,7 @@ const AdminPage = () => {
     }
   };
 
-  const renderStatusIcon = (status: string) => {
+  /*const renderStatusIcon = (status: string) => {
     if (status === "Verde" || null) {
       return <FaCheckCircle className="text-green-500" />;
     } else if (status === "Amarillo") {
@@ -78,7 +77,7 @@ const AdminPage = () => {
       return <FaTimesCircle className="text-red-500" />;
     }
     return null;
-  };
+  };*/
 
   return (
     <div className="min-h-screen bg-white p-8">

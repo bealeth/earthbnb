@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Container from "../components/Container";
 import Heading2 from "../components/Heading2";
 import { SafeListing, SafeUser } from "../types";

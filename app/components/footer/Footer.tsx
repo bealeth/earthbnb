@@ -2,11 +2,9 @@
 
 import React from 'react';
 import FoItem from './FoItem';
-import useRentModal from '@/app/hooks/useRentModel';
 import { useRouter } from 'next/navigation';
 
 const Footer: React.FC = () => {
-  const rentModel = useRentModal();
   const router = useRouter();
   return (
     <footer className="bg-white text-blue py-8">

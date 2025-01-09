@@ -2,7 +2,7 @@
 
 import toast from "react-hot-toast";
 import axios from "axios";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState} from "react";
 import { useRouter } from "next/navigation";
 import { safeReservation, SafeUser } from "../types/index";
 import Heading from "../components/Heading";

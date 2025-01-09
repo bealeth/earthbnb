@@ -16,9 +16,13 @@ export async function GET() {
       },
     });
     return NextResponse.json(users);
-  } catch (error) {
-    return NextResponse.json({ error: "Error al obtener usuarios" }, { status: 500 });
-  }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+        throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred");
+};
+
 }
 
 
@@ -41,10 +45,13 @@ export async function PUT(request: Request) {
     });
 
     return NextResponse.json(updatedUser);
-  } catch (error) {
-    console.error("Error al actualizar el usuario:", error);
-    return NextResponse.json({ error: "Error al actualizar el usuario" }, { status: 500 });
-  }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+        throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred");
+};
+
 }
 
 
@@ -57,9 +64,13 @@ export async function PATCH(request: Request) {
       data: { role: "warned" }, // Marca como amonestado
     });
     return NextResponse.json({ message: "Usuario amonestado exitosamente" });
-  } catch (error) {
-    return NextResponse.json({ error: "Error al amonestar usuario" }, { status: 500 });
-  }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+        throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred");
+};
+
 }
 
 // Eliminar usuario
@@ -68,7 +79,11 @@ export async function DELETE(request: Request) {
   try {
     await prisma.user.delete({ where: { id } });
     return NextResponse.json({ message: "Usuario eliminado exitosamente" });
-  } catch (error) {
-    return NextResponse.json({ error: "Error al eliminar usuario" }, { status: 500 });
-  }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+        throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred");
+};
+
 }

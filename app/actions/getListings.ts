@@ -24,8 +24,25 @@ export default async function getListings(params: IListingsParams = {}) {
       category,
     } = params;
 
-    // Crear la consulta inicial vacía
-    let query: any = {};
+    // Crear la consulta inicial vacía con un tipo explícito
+    const query: {
+      userId?: string;
+      roomCount?: { gte: number };
+      bathroomCount?: { gte: number };
+      guestCount?: { gte: number };
+      locationValue?: string;
+      category?: string;
+      NOT?: {
+        reservations: {
+          some: {
+            OR: Array<{
+              endDate: { gte: string };
+              startDate: { lte: string };
+            }>;
+          };
+        };
+      };
+    } = {};
 
     // Construir la consulta con condiciones opcionales
     if (userId) {
@@ -93,8 +110,8 @@ export default async function getListings(params: IListingsParams = {}) {
     }));
 
     return safeListings;
-  } catch (error: any) {
-    console.error("Error en getListings:", error);
-    throw new Error(`Error al obtener las propiedades: ${error.message}`);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(errorMessage);
   }
 }

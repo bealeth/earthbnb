@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+
+import React, { useState } from "react";
 
 interface ListingDetailsProps {
     listingId: string;
 }
 
-const ListingDetails: React.FC<ListingDetailsProps> = ({ listingId }) => {
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+const ListingDetails: React.FC<ListingDetailsProps> = ({ }) => {
+    const [error] = useState<string | null>(null);
 
     return (
         <div className="p-6 bg-white shadow-md rounded-md">

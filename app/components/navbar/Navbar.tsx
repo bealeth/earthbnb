@@ -15,7 +15,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
   // Comprobación del rol del usuario para decidir qué mostrar
-  const isUser = currentUser?.role === "user"; // Verifica si el usuario es "user"
+  
   const isAdminOrCenterHelp =
     currentUser?.role === "admin" || currentUser?.role === "center-help"; // Verifica si el usuario es admin o center-help
 

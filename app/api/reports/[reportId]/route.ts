@@ -15,9 +15,13 @@ export async function PATCH(req: Request, { params }: { params: { reportId: stri
     });
 
     return NextResponse.json(updatedReport);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to update report" }, { status: 500 });
-  }
+  } catch (error: unknown) {
+      if (error instanceof Error) {
+          throw new Error(error.message);
+      }
+      throw new Error("An unexpected error occurred");
+  };
+
 }
 
 export async function DELETE(req: Request, { params }: { params: { reportId: string } }) {
@@ -29,7 +33,11 @@ export async function DELETE(req: Request, { params }: { params: { reportId: str
     });
 
     return NextResponse.json({ message: "Report deleted successfully" });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to delete report" }, { status: 500 });
-  }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+        throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred");
+};
+
 }

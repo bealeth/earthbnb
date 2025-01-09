@@ -8,7 +8,7 @@ interface InputProps {
     disabled?: boolean;
     formatPrice?: boolean;
     required?: boolean;
-    validation?: { [key: string]: any };
+    validation?: Record<string, unknown>; // Cambié de `{ [key: string]: any }` a `Record<string, unknown>`
     register?: UseFormRegister<FieldValues>;
     errors?: FieldErrors;
     value?: string;

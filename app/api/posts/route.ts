@@ -56,8 +56,12 @@ export async function GET() {
       },
     });
     return NextResponse.json(documents);
-  } catch (error) {
-    return NextResponse.json({ error: "Error al obtener documentos" }, { status: 500 });
-  }
+  } catch (error: unknown) {
+      if (error instanceof Error) {
+          throw new Error(error.message);
+      }
+      throw new Error("An unexpected error occurred");
+  };
+
 }
 

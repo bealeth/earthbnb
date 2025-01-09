@@ -37,8 +37,10 @@ export default async function getListingById(
         };
 
     }
-    catch(error: any){
-        throw new Error(error);
+    catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(errorMessage);
     };
+    
     
 }

@@ -7,8 +7,16 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png"
 
-// @ts-expect-error
+
+// @ts-expect-error: El método _getIconUrl no está definido en los tipos de leaflet, pero es necesario eliminarlo.
 delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon.src,
+    iconRetinaUrl: markerIcon2x.src,
+    shadowUrl: markerShadow.src
+});
+
 
 L.Icon.Default.mergeOptions({
     iconUrl: markerIcon.src,

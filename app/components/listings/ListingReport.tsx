@@ -33,11 +33,12 @@ const ListingReport: React.FC<ListingReportProps> = ({
       alert('Reporte enviado con éxito.');
       setIsVisible(false); // Cierra el formulario de reporte
       setReason(''); // Limpia la descripción
-    } catch (error) {
+    } catch {
       alert('Error enviando reporte.');
     } finally {
       setLoading(false);
     }
+    
   };
 
   return (

@@ -37,14 +37,11 @@ const ListingClient: React.FC<ListingClientProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [totalPrice, setTotalPrice] = useState(listing.price);
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
-  const [reason, setReason] = useState(""); // Estado para el motivo del reporte
-  const [isVisible, setIsVisible] = useState(false); // Estado para controlar visibilidad del formulario
-
 
   const disabledDates = useMemo(() => {
     let dates: Date[] = [];
 
-    reservations.forEach((reservation: any) => {
+    reservations.forEach((reservation: safeReservation) => {
       const range = eachDayOfInterval({
         start: new Date(reservation.startDate),
         end: new Date(reservation.endDate),
@@ -81,44 +78,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
       });
   }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
   
-  const onCreateReport = useCallback(
-    async ({ reason }: { reason: string }) => {
-      if (!currentUser) {
-        loginModal.onOpen();
-        return;
-      }
-  
-      if (!reason.trim()) {
-        toast.error("Por favor, proporciona una descripción válida.");
-        return;
-      }
-  
-      setIsLoading(true);
-  
-      // Log para verificar los datos que se están enviando
-      console.log("Datos del reporte enviados al servidor:", {
-        reason: reason.trim(),
-        listingId: listing?.id,
-      });
-  
-      try {
-        axios.post('app/api/report', {
-          reason: reason.trim(),
-          listingId: listing?.id,
-        });
-  
-        toast.success("¡Reporte enviado!");
-        setReason(""); // Limpia el estado del motivo
-        setIsVisible(false); // Cierra el formulario de reporte
-      } catch (error) {
-        console.error("Error al enviar el reporte:", error); // Log del error para depuración
-        toast.error("Oh, no. Algo salió mal al enviar el reporte.");
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [currentUser, loginModal, listing?.id]
-  );
   
 
   useEffect(() => {

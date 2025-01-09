@@ -2,13 +2,10 @@ import { NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
 
-interface IParams {
-  postId?: string;
-}
-
+// No es necesario definir la interfaz IParams si usas el tipo de Next.js para rutas dinámicas
 export async function DELETE(
   request: Request,
-  { params }: { params: IParams }
+  { params }: { params: { postId: string } } // Tipado correcto
 ) {
   const currentUser = await getCurrentUser();
 
@@ -67,7 +64,7 @@ export async function DELETE(
 
 export async function PUT(
   request: Request,
-  { params }: { params: IParams }
+  { params }: { params: { postId: string } } // Tipado correcto
 ) {
   const currentUser = await getCurrentUser();
 

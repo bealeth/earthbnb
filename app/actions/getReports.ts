@@ -18,7 +18,6 @@ export default async function getReports(params: IParams) {
     const reports = await prisma.report.findMany({
       where: query,
       include: {
-        reportedListing: true,
         reporter: true,
       },
       orderBy: { createdAt: "desc" },
@@ -35,20 +34,20 @@ export default async function getReports(params: IParams) {
 
     const SafeReport = reports.map((report) => ({
       id: report.id,
-      reporterName: report.reporter?.name || "Desconocido",
-      reportedListingTitle: report.reportedListing?.title || "Alojamiento no especificado",
+      reporterName: report.reporterId || "Desconocido",
       reason: report.reason,
       status: report.status,
       createdAt: report.createdAt.toISOString(),
-      reviewedAt: report.reviewedAt ? report.reviewedAt.toISOString() : null,
       sanctionAmount: report.sanctionAmount ?? null,
     }));
 
     console.log("Reportes formateados correctamente:", SafeReport);
     return SafeReport;
 
-  } catch (error: any) {
-    console.error("Error al obtener los reportes: ", error);
-    return []; // Devolver un arreglo vacío en caso de error
-  }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+        throw new Error(error.message);
+    }
+    throw new Error("Unexpected error occurred");
+}
 }

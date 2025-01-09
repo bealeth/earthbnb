@@ -3,7 +3,7 @@
 import Container from "@/app/components/Container";
 import ProfileBoard from "@/app/components/ProfileBoard";
 import ListingCard from "@/app/components/listings/ListingCard";
-import { SafeUser2, SafeListing, SafeUser } from "@/app/types";
+import { SafeUser2, SafeListing } from "@/app/types";
 
 interface ProfileHeadProps {
   user: SafeUser2;// El objeto usuario debe cumplir con el tipo SafeUser2.

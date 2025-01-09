@@ -21,7 +21,6 @@ const ReportCard: React.FC<ReportCardProps> = ({
     onAction,
     disabled,
     actionLabel,
-    secondActionLabel,
     actionId = "",
 }) => {
     const router = useRouter();
@@ -54,7 +53,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                     Fecha de reporte: {format(new Date(data.createdAt), 'PP')}
                 </div>
                 <div className="text-sm text-neutral-400">
-                    Alojamiento reportado: {data.reportedListingId}
+                    Alojamiento reportado: {data.reportedUserId}
                 </div>
                 <div className="font-light text-neutral-700">
                     Razón: {data.reason || "No especificada"}
